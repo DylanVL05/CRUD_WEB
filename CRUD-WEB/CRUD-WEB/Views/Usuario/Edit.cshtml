@@ -1,0 +1,87 @@
+﻿@model CRUD_WEB.Models.Usuarios
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Usuarios</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.nombre, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.nombre, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.nombre, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.correo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.correo, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.correo, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.contrasena, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.PasswordFor(model => model.contrasena, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.HashContrasena)
+                @Html.HiddenFor(model => model.Salt)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
+
+    <script>
+        // Generar un salt único al cargar la página
+        $(document).ready(function () {
+            $("#Salt").val(generateUniqueSalt());
+        });
+
+        // Función para generar un salt único (puedes personalizar esta función según tus necesidades)
+        function generateUniqueSalt() {
+            // Lógica para generar un salt único (puedes utilizar bibliotecas o funciones específicas)
+            // Ejemplo simple: Devolver un valor de tiempo actual o un valor aleatorio único
+            return new Date().getTime().toString();
+        }
+
+        // Función para realizar el hashing de la contraseña y actualizar los campos ocultos antes de enviar el formulario
+        $("form").submit(function () {
+            var password = $("#contrasena").val();
+            var salt = $("#Salt").val();
+            var hashedPassword = CryptoJS.SHA256(password + salt).toString(CryptoJS.enc.Hex);
+
+            // Asignar los valores calculados a los campos ocultos
+            $("#HashContrasena").val(hashedPassword);
+            $("#contrasena").val(""); // Limpiar el campo de contraseña original
+
+            return true; // Continuar con el envío del formulario
+        });
+    </script>
+}
